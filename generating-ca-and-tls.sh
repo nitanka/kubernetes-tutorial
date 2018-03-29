@@ -1,11 +1,14 @@
 #!/bin/bash
 
+KUBERNETES_PUBLIC_ADDRESS=172.17.0.2
+INTERNAL_IP=172.17.0.2
+EXTERNAL_IP=172.17.0.2
+instance=d56df529eeef
 #generating the ca configuration
 
 . client-tools.sh
 
-install-cfssl
-
+install-cffsl
 install-kubectl
 
 
@@ -26,7 +29,7 @@ generate-ca-config()
           }
         }
       }
-      EOF`
+      `
 }
 
 
@@ -50,8 +53,7 @@ create-csr()
             "ST": "Oregon"
           }
         ]
-      }      
-      EOF`
+      }`
 }
 
 #generate the CA certificate and private key
@@ -86,8 +88,7 @@ generate-admin-config()
                "ST": "Oregon"
              }
            ]
-         }
-         EOF`
+         }`
 }
 
 generate-admin-cer-pk()
@@ -124,8 +125,7 @@ generate-client-config()
                "ST": "Oregon"
              }
            ]
-         }
-         EOF`
+         }`
 }
 
 generate-client-certificate()
@@ -164,9 +164,7 @@ generate-kube-proxy-config()
               "ST": "Oregon"
             }
           ]
-        }
-        EOF
-	`
+        }`
 }
 
 generate-kube-proxy-cert()
@@ -203,8 +201,7 @@ generate-api-server-config()
                "ST": "Oregon"
              }
            ]
-         }
-         EOF`
+         }`
 
 }
 
@@ -295,8 +292,7 @@ generating-encryption-key()
                    keys:
                      - name: key1
                        secret: ${ENCRYPTION_KEY}
-               - identity: {}
-         EOF`
+               - identity: {}`
 }
 
 
@@ -310,9 +306,9 @@ setting-up-etcd()
 	wget -q --show-progress --https-only --timestamping \
   "https://github.com/coreos/etcd/releases/download/v3.2.11/etcd-v3.2.11-linux-amd64.tar.gz"
 	tar -xvf etcd-v3.2.11-linux-amd64.tar.gz
-	sudo mv etcd-v3.2.11-linux-amd64/etcd* /usr/local/bin/
-	sudo mkdir -p /etc/etcd /var/lib/etcd
-	sudo cp ca.pem kubernetes-key.pem kubernetes.pem /etc/etcd/
+	mv etcd-v3.2.11-linux-amd64/etcd* /usr/local/bin/
+	mkdir -p /etc/etcd /var/lib/etcd
+	cp ca.pem kubernetes-key.pem kubernetes.pem /etc/etcd/
 	ETCD_NAME=$(hostname -s)
 
 	`cat > etcd.service <<EOF
@@ -344,13 +340,12 @@ setting-up-etcd()
          
          [Install]
          WantedBy=multi-user.target
-         EOF
          `
-	sudo mv etcd.service /etc/systemd/system/
-	sudo systemctl daemon-reload
+	mv etcd.service /etc/systemd/system/
+	systemctl daemon-reload
 
-	sudo systemctl enable etcd
-	sudo systemctl start etcd
+	systemctl enable etcd
+	systemctl start etcd
 	ETCDCTL_API=3 etcdctl member list
 
 }
